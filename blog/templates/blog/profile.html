@@ -1,0 +1,64 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Личная информация -->
+        <div class="col-md-4 text-center">
+            <div class="card">
+                <div class="card-body">
+                    <img src="{{ user_profile.avatar.url }}" class="rounded-circle mb-3" alt="Аватар" style="width: 150px; height: 150px; object-fit: cover;">
+                    <h4 class="card-title">{{ user.username }}</h4>
+                    <p class="text-muted">{{ user_profile.bio }}</p>
+                </div>
+            </div>
+
+            <!-- Кнопка редактирования -->
+            <div class="mt-4">
+                <a href="#" class="btn btn-outline-primary w-100">Изменить профиль</a>
+            </div>
+        </div>
+
+        <!-- Ваши посты -->
+        <div class="col-md-8">
+            <h3 class="mb-4">Ваши посты</h3>
+            {% if posts %}
+                <div class="list-group">
+                    {% for post in posts %}
+                        <a href="{% url 'post_detail' post.pk %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">{{ post.content|truncatewords:10 }}</h5>
+                                <small>{{ post.created_at|date:"d M Y" }}</small>
+                            </div>
+                            <p class="mb-1">{{ post.content|truncatewords:20 }}</p>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <p>У вас пока нет постов.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Форма изменения профиля -->
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <h3>Редактировать профиль</h3>
+            <form method="POST" enctype="multipart/form-data" class="mt-4">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="avatar" class="form-label">Аватар</label>
+                    <input type="file" name="avatar" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label for="bio" class="form-label">О себе</label>
+                    <textarea name="bio" class="form-control" rows="4">{{ user_profile.bio }}</textarea>
+                </div>
+                <button type="submit" class="btn btn-success">Сохранить изменения</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

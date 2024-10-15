@@ -1,0 +1,68 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h4 style="text-align: center; margin-top: -20px; font-weight: 350;">Список постов</h4>
+    <div class="row my-4">
+        {% for post in posts %}
+            <div class="col-md-4 mb-4">
+                <div class="card shadow p-3 mb-5 bg-white rounded">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ post.content|truncatewords:3 }}</h5>
+                        <p class="card-text">{{ post.content }}</p>
+                        <p class="text-muted">
+                            Автор: {{ post.author }}<br>
+                            {{ post.created_at|date:"d M Y H:i" }}
+                        </p>
+                        <!-- Кнопка лайка с отображением количества лайков -->
+                        <div class="d-inline">
+                            <button class="btn btn-outline-primary btn-sm like-button" data-post-id="{{ post.pk }}">
+                                👍 
+                            </button>
+                            <span class="likes-count">{{ post.like_set.count }}</span>
+                        </div>
+                        <!-- Кнопка комментариев -->
+                        <a href="{% url 'post_detail' post.pk %}" class="btn btn-outline-secondary btn-sm">💬 Комментарии</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p>Нет постов для отображения.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const likeButtons = document.querySelectorAll('.like-button');
+
+        likeButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const postId = this.getAttribute('data-post-id');
+                const csrfToken = '{{ csrf_token }}'; // Получаем CSRF токен
+
+                // Отправляем AJAX запрос
+                fetch(`/like/${postId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Обновляем количество лайков
+                        const likesCount = this.nextElementSibling;
+                        likesCount.textContent = data.likes_count;
+
+                        // Добавляем анимацию нажатия
+                        this.classList.toggle('liked'); // Добавьте стили для класса 'liked' в CSS
+                    }
+                })
+                .catch(error => console.error('Ошибка:', error));
+            });
+        });
+    });
+</script>
+{% endblock %}

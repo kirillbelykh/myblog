@@ -1,0 +1,35 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2 class="my-4">{{ post.content|truncatewords:10 }}</h2>  <!-- Используем content, так как заголовка нет -->
+    <p class="text-muted">
+        Автор: {{ post.author }}<br>
+        Дата публикации: {{ post.created_at|date:"d M Y H:i" }}
+    </p>
+
+    {% if post.image %}
+        <img src="{{ post.image.url }}" alt="Изображение поста" class="img-fluid mb-4">
+    {% endif %}
+
+    <p>{{ post.content }}</p>
+
+    <h4>Комментарии</h4>
+    {% for comment in comments %}
+        <div class="mb-3">
+            <strong>{{ comment.user.username }}</strong>  <!-- Измените на user, если используете связь с моделью User -->
+            <p>{{ comment.content }}</p>  <!-- Убедитесь, что поле для текста комментария называется 'content' -->
+            <small class="text-muted">{{ comment.created_at|date:"d M Y H:i" }}</small>
+        </div>
+    {% empty %}
+        <p>Комментариев пока нет.</p>
+    {% endfor %}
+
+    <!-- Форма для добавления комментария -->
+    <form method="post" class="mt-4">
+        {% csrf_token %}
+        {{ form.as_p }}  <!-- Отображаем поля формы для комментариев -->
+        <button type="submit" class="btn btn-primary">Отправить комментарий</button>
+    </form>
+</div>
+{% endblock %}

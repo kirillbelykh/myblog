@@ -1,0 +1,46 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Регистрация</h2>
+    <form method="post" enctype="multipart/form-data" id="registrationForm">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="username" class="form-label">Имя пользователя</label>
+            {{ form.username }}
+        </div>
+
+        <div class="mb-3" id="passwordField">
+            <label for="password" class="form-label">Пароль</label>
+            {{ form.password1 }}
+            <small id="passwordHelp" class="form-text text-muted">Пароль должен содержать не менее 8 символов.</small>
+        </div>
+
+        <div class="mb-3 d-none" id="passwordConfirmField">
+            <label for="password2" class="form-label">Подтверждение пароля</label>
+            {{ form.password2 }}
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Зарегистрироваться</button>
+    </form>
+</div>
+
+<script>
+    const passwordField = document.getElementById('id_password1');
+    const passwordConfirmField = document.getElementById('passwordConfirmField');
+    const passwordHelp = document.getElementById('passwordHelp');
+
+    passwordField.addEventListener('input', function() {
+        const password = passwordField.value;
+        if (password.length < 8) {
+            passwordHelp.classList.add('text-danger');
+            passwordHelp.innerText = 'Пароль слишком короткий.';
+            passwordConfirmField.classList.add('d-none');
+        } else {
+            passwordHelp.classList.remove('text-danger');
+            passwordHelp.innerText = '';
+            passwordConfirmField.classList.remove('d-none');
+        }
+    });
+</script>
+{% endblock %}
